@@ -16,7 +16,7 @@ body {
 
 canvas {
     image-rendering: pixelated;
-    background-image: url("/assets/grid-1.png");
+    background-image: url("/map2tileset/assets/grid-1.png");
     background-repeat: repeat;
     background-blend-mode: luminosity;
 }
@@ -44,7 +44,7 @@ svg {
     left: 0;
     overflow: scroll;
     margin: 0;
-    background-image: url("/assets/transparent-texture.png");
+    background-image: url("/map2tileset/assets/transparent-texture.png");
     background-repeat: repeat;
 }
 
@@ -58,7 +58,7 @@ svg {
     left: 50dvw;
     overflow: scroll;
     margin: 0;
-    background-image: url("/assets/transparent-texture.png");
+    background-image: url("/map2tileset/assets/transparent-texture.png");
     background-repeat: repeat;
 }
 
