@@ -1,2 +1,685 @@
-(()=>{var C=document.getElementById("save-tileset"),x=document.getElementById("undo-btn"),L=document.getElementById("redo-btn"),h=document.getElementById("image"),Y=document.getElementById("offset-x"),T=document.getElementById("offset-y"),r=document.getElementById("imageCanvas"),y=document.getElementById("tileset"),l=document.getElementById("tilesetCanvas"),f=document.getElementById("red-zone"),a=document.getElementById("floating-canvas"),b=document.getElementById("selected-area-label"),O=document.getElementById("image-zoom"),W=document.getElementById("tileset-zoom"),A=document.getElementById("left-panel"),g=document.getElementById("right-panel"),t={sx:0,sy:0,ex:0,ey:0,isDirty:!1,isComplete:!1,data:void 0},s={name:"",width:0,height:0,isLoaded:!1,zoom:1,offsetX:0,offsetY:0},i={name:"",width:0,height:0,isLoaded:!1,zoom:1,undos:[],redos:[]},c={tilesize:+localStorage.getItem("tilesize")||8},v,w=document.querySelector("nav").clientHeight;document.getElementById("open-image").addEventListener("change",j,!1);document.getElementById("open-tileset").addEventListener("change",V,!1);document.getElementById("settings-btn").addEventListener("click",D,!1);document.getElementById("about-btn").addEventListener("click",D,!1);document.getElementById("new-tileset-btn").addEventListener("click",D,!1);document.addEventListener("wheel",le,{passive:!1});document.querySelectorAll('[id ^= "close-"]').forEach(e=>e.addEventListener("click",B));document.getElementById("confirm-settings-btn").addEventListener("click",P);document.getElementById("confirm-tileset-btn").addEventListener("click",_,!1);document.addEventListener("keydown",de);Y.addEventListener("change",q,!1);T.addEventListener("change",G,!1);b.addEventListener("click",I,!1);r.addEventListener("mousedown",J,!1);r.addEventListener("mouseup",Q,!1);r.addEventListener("contextmenu",I,!1);x.addEventListener("click",H,!1);L.addEventListener("click",K,!1);C.addEventListener("click",S,!1);l.addEventListener("mousemove",te,!1);l.addEventListener("click",ee,!1);l.addEventListener("contextmenu",ne,!1);c.tilesize!==8&&(r.style.backgroundImage=`url("/assets/grid-${c.tilesize/8}.png")`,l.style.backgroundImage=`url("/assets/grid-${c.tilesize/8}.png")`);function D(e){e.preventDefault(),document.getElementById("tilesize").value=c.tilesize;let o=document.getElementById(e.currentTarget.getAttribute("data-target"));o.open=!0,v=o}function B(e){v=void 0,e.preventDefault(),document.getElementById("tilesize").value=c.tilesize;let o=document.getElementById(e.currentTarget.getAttribute("data-target"));o.open=!1}function P(e){e.preventDefault(),c.tilesize=+document.getElementById("tilesize").value,localStorage.setItem("tilesize",c.tilesize),B(e)}function j(e){let o=e.target.files,n=o.length;if(N(),n>0){s.name=o.name;let d=URL.createObjectURL(o[0]);h.src=d,h.addEventListener("load",u=>{s.width=h.naturalWidth,s.height=h.naturalHeight,r.classList.remove("none"),X(r,h),s.isLoaded=!0},{once:!0})}}function R(){r.getContext("2d").clearRect(0,0,r.width,r.height),X(r,h,s.offsetX,s.offsetY)}function E(){let e=r.getContext("2d");try{t.data=e.getImageData(t.sx/s.zoom,t.sy/s.zoom,(t.ex-t.sx)/s.zoom,(t.ey-t.sy)/s.zoom)}catch(n){alert("Select a zone first");return}a.classList.remove("none"),a.classList.add("floating-canvas"),a.width=t.ex-t.sx,a.height=t.ey-t.sy,a.getContext("2d").putImageData(t.data,0,0)}function q(e){s.offsetX=+e.target.value,s.isLoaded&&R()}function G(e){s.offsetY=+e.target.value,s.isLoaded&&R()}function N(){s.offsetX=0,s.offsetY=0,Y.value=0,T.value=0}function J(e){s.isLoaded===!1||e.button!==0||(t.isComplete&&I(e),t.sx=m((e.offsetX-s.offsetX)/s.zoom)*s.zoom,t.sy=m((e.offsetY-s.offsetY)/s.zoom)*s.zoom,t.isDirty=!0,U(t.sx,t.sy))}function Q(e){if(t.isDirty===!1||s.isLoaded===!1||t.isComplete===!0||e.button!==0)return;let o=m((e.offsetX-t.sx)/s.zoom),n=m((e.offsetY-t.sy)/s.zoom);for(;k(o)===!1;)o=Math.floor(o+1);for(;k(n)===!1;)n=Math.floor(n+1);t.ex=t.sx+o*s.zoom,t.ey=t.sy+n*s.zoom,t.ex===t.sx&&(t.ex+=c.tilesize),t.ey===t.sy&&(t.ey+=c.tilesize),t.isComplete=!0,ie(t),E()}function V(e){let o=e.target.files;if(o.length>0){i.name=o[0].name;let d=URL.createObjectURL(o[0]);y.src=d,y.addEventListener("load",u=>{i.width=y.naturalWidth,i.height=y.naturalHeight,l.classList.remove("none"),X(l,y),i.isLoaded=!0,C.disabled=!1,s.isLoaded&&t.isComplete&&E()},{once:!0})}}function _(e){let o=document.getElementById("tileset-name").value||"tileset";i.name=o+".png",i.width=+document.getElementById("tileset-width").value||512,i.height=+document.getElementById("tileset-height").value||512,l.width=i.width,l.height=i.height;let n=l.getContext("2d");n.fillStyle="rgba(0, 0, 0, 0)",n.fillRect(0,0,i.width,i.height),y.src=l.toDataURL(),l.classList.remove("none"),i.isLoaded=!0,C.disabled=!1,s.isLoaded&&t.isComplete&&E(),B(e)}function S(){let e=l.toDataURL("image/png"),o=new XMLHttpRequest;o.responseType="blob",o.onload=function(){let n=document.createElement("a");n.href=window.URL.createObjectURL(o.response),n.download=i.name,n.style.display="none",document.body.appendChild(n),n.click(),n.remove()},o.open("GET",e),o.send()}function ee(e){let o=m(e.offsetX/i.zoom)-m(t.data.width/2),n=m(e.offsetY/i.zoom)-m(t.data.height/2),d=(t.ex-t.sx)/s.zoom,u=(t.ey-t.sy)/s.zoom;if(t.data){let z=l.getContext("2d"),Z=z.getImageData(o,n,d,u),$=new p(Z,o,n,d,u);i.undos.push($);let F=a.getContext("2d").getImageData(0,0,t.data.width,t.data.height);z.putImageData(F,o,n),x.disabled=!1}}function H(){let e=i.undos.at(-1);if(!e)return;let o=l.getContext("2d"),n=o.getImageData(e.x,e.y,e.width,e.height),d=new p(n,e.x,e.y,e.width,e.height);i.redos.push(d),o.clearRect(e.x,e.y,e.width,e.height),o.putImageData(e.data,e.x,e.y),i.undos.pop(),L.disabled=!1,i.undos.length===0&&(x.disabled=!0)}function K(){let e=i.redos.at(-1);if(!e)return;let o=l.getContext("2d"),n=o.getImageData(e.x,e.y,e.width,e.height),d=new p(n,e.x,e.y,e.width,e.height);i.undos.push(d),o.clearRect(e.x,e.y,e.width,e.height),o.putImageData(e.data,e.x,e.y),i.redos.pop(),x.disabled=!1,i.redos.length===0&&(L.disabled=!0)}function te(e){if(t.data===void 0)return;a.style.width!==a.width*i.zoom+"px"&&(a.style.width=a.width*i.zoom+"px",a.style.height=a.height*i.zoom+"px");let o=(m(e.offsetX/i.zoom)-m(t.data.width/2))*i.zoom,n=(m(e.offsetY/i.zoom)-m(t.data.height/2))*i.zoom,d=document.body.clientWidth/2-g.scrollLeft,u=w-g.scrollTop;a.style.left=d+o+"px",a.style.top=u+n+"px"}function oe(){let e=a.getContext("2d"),o=document.createElement("canvas");o.getContext("2d").drawImage(a,0,0),e.clearRect(0,0,t.data.width,t.data.height),e.translate(t.data.width,0),e.scale(-1,1),e.drawImage(o,0,0),e.setTransform(1,0,0,1,0,0)}function se(){let e=a.getContext("2d"),o=document.createElement("canvas");o.getContext("2d").drawImage(a,0,0),e.clearRect(0,0,t.data.width,t.data.height),e.translate(0,t.data.height),e.scale(1,-1),e.drawImage(o,0,0),e.setTransform(1,0,0,1,0,0)}function ne(e){e.stopPropagation(),e.preventDefault(),e.button===2&&(a.getContext("2d").clearRect(0,0,a.width,a.height),t.data=void 0,a.style.left="0px",a.style.top="0px",a.width="0px",a.height="0px")}function U(e,o){t.isComplete||(f.style.width="0px",f.style.height="0px",f.style.left=e+"px",f.style.top=o+"px")}function ie(e){let o=m(e.ex-e.sx),n=m(e.ey-e.sy);f.style.width!==o+"px"&&(f.style.width=o+"px"),f.style.height!==n+"px"&&(f.style.height=n+"px"),b.innerHTML=`Width: ${o/c.tilesize} Height: ${n/c.tilesize}`}function ae(){f.style.width="0px",f.style.height="0px",f.style.left="0px",f.style.top="0px"}function le(e){if(e.ctrlKey&&e.preventDefault(),e.ctrlKey&&e.target.id==="imageCanvas"&&s.isLoaded){t.isComplete&&I(e);let o,n;if(e.wheelDelta>0){if(s.zoom===64)return;s.zoom=M(s.zoom*2,0,64),o=(e.offsetX-e.clientX/2)*2,n=(e.offsetY-(e.clientY-w)/2)*2}else if(e.wheelDelta<0){if(s.zoom<.02)return;s.zoom/=2,o=(e.offsetX-e.clientX*2)/2,n=(e.offsetY-(e.clientY-w)*2)/2}r.style.width=s.width*s.zoom+"px",r.style.height=s.height*s.zoom+"px",A.scroll(o,n),O.innerText=`Zoom: ${s.zoom}`,s.zoom>=1&&(r.style.backgroundImage=`url("/assets/grid-${s.zoom*c.tilesize/8}.png")`)}if(e.ctrlKey&&e.target.id==="tilesetCanvas"&&i.isLoaded){let o,n;if(e.wheelDelta>0){if(i.zoom===64)return;i.zoom=M(i.zoom*2,0,64),o=(e.offsetX-(e.clientX-g.offsetLeft)/2)*2,n=(e.offsetY-(e.clientY-g.offsetTop)/2)*2}else if(e.wheelDelta<0){if(i.zoom<.02)return;i.zoom/=2,o=(e.offsetX-(e.clientX-g.offsetLeft)*2)/2,n=(e.offsetY-(e.clientY-g.offsetTop)*2)/2}l.style.width=i.width*i.zoom+"px",l.style.height=i.height*i.zoom+"px",g.scroll(o,n),W.innerText=`Zoom: ${i.zoom}`,i.zoom>=1&&(l.style.backgroundImage=`url("/assets/grid-${i.zoom*c.tilesize/8}.png")`)}}function de(e){if(e.ctrlKey&&e.key==="z"&&x.disabled===!1){e.preventDefault(),H();return}if(e.ctrlKey&&e.key==="y"&&L.disabled===!1){e.preventDefault(),K();return}if(e.ctrlKey&&e.key==="s"&&i.isLoaded){e.preventDefault(),S();return}if(e.ctrlKey===!1&&e.key==="x"&&t.data!==void 0){oe();return}if(e.ctrlKey===!1&&e.key==="y"&&t.data!==void 0){se();return}e.ctrlKey&&e.key==="a"&&s.isLoaded&&(e.preventDefault(),t.sx=0,t.sy=w,t.isDirty=!0,U(t.sx,t.sy),t.ex=s.width,t.ey=s.height,t.isComplete=!0,f.style.width=s.width+"px",f.style.height=s.height+"px",E())}function ce(){t.sx=0,t.sy=0,t.ex=0,t.ey=0,t.isDirty=!1}function X(e,o,n=0,d=0){let u=e.getContext("2d");e.width=o.naturalWidth,e.height=o.naturalHeight,u.drawImage(o,n,d)}function m(e){let o=c.tilesize;return Math.round(e/o)*o}function k(e){return e===0?!1:e%c.tilesize===0}function M(e,o,n){return Math.max(o,Math.min(e,n))}function I(e){e.stopPropagation(),e.preventDefault(),ce(),ae(),t.isComplete=!1,b.innerHTML="Width: 0 Height: 0"}var p=class{constructor(o,n,d,u,z){this.data=o,this.x=n,this.y=d,this.width=u,this.height=z}};})();
-//# sourceMappingURL=script.js.map
+(()=>{
+// Html elements
+const saveTilesetBtn = document.getElementById('save-tileset');
+const undoBtn = document.getElementById('undo-btn');
+const redoBtn = document.getElementById('redo-btn');
+const imageElm = document.getElementById("image");
+const offsetXInput = document.getElementById('offset-x');
+const offsetYInput = document.getElementById('offset-y');
+/**@type {HTMLCanvasElement} */
+const imageCanvas = document.getElementById('imageCanvas');
+const tilesetElm = document.getElementById("tileset");
+/**@type {HTMLCanvasElement} */
+const tilesetCanvas = document.getElementById('tilesetCanvas');
+const redZone = document.getElementById("red-zone");
+/**@type {HTMLCanvasElement} */
+const floatingCanvas = document.getElementById('floating-canvas');
+const selectedAreaLabelElm = document.getElementById('selected-area-label');
+const imageZoomLabel = document.getElementById('image-zoom');
+const tilesetZoomLabel = document.getElementById('tileset-zoom');
+const leftPanel = document.getElementById('left-panel');
+const rightPanel = document.getElementById('right-panel');
+
+// Data
+const selectedImageArea = {
+    sx: 0,
+    sy: 0,
+    ex: 0,
+    ey: 0,
+    isDirty: false,
+    isComplete: false,
+    data: undefined
+}
+
+const image = {
+    name: '',
+    width: 0,
+    height: 0,
+    isLoaded: false,
+    zoom: 1,
+    offsetX: 0,
+    offsetY: 0
+}
+
+const tileset = {
+    name: '',
+    width: 0,
+    height: 0,
+    isLoaded: false,
+    zoom: 1,
+    undos: [],
+    redos: []
+}
+
+const settings = {
+    tilesize: +localStorage.getItem('tilesize') || 8
+}
+
+let visibleModal = undefined;
+const navbarHeight = document.querySelector('nav').clientHeight;
+
+// Event listeners
+document.getElementById('open-image').addEventListener('change', openImage, false);
+document.getElementById('open-tileset').addEventListener('change', openTileset, false);
+document.getElementById('settings-btn').addEventListener('click', openModal, false);
+document.getElementById('about-btn').addEventListener('click', openModal, false);
+document.getElementById('new-tileset-btn').addEventListener('click', openModal, false);
+document.addEventListener('wheel', onMouseWheel, { passive: false });
+(document.querySelectorAll('[id ^= "close-"]')).forEach(elm => elm.addEventListener('click', closeModal));
+document.getElementById('confirm-settings-btn').addEventListener('click', saveSettings);
+document.getElementById('confirm-tileset-btn').addEventListener('click', createNewTileset, false);
+document.addEventListener('keydown', handleKeyPress);
+offsetXInput.addEventListener('change', setOffsetX, false);
+offsetYInput.addEventListener('change', setOffsetY, false);
+selectedAreaLabelElm.addEventListener('click', resetSelection, false);
+imageCanvas.addEventListener('mousedown', onImageCanvasMouseDown, false);
+imageCanvas.addEventListener('mouseup', onImageCanvasMouseUp, false);
+imageCanvas.addEventListener('contextmenu', resetSelection, false);
+undoBtn.addEventListener('click', undo, false);
+redoBtn.addEventListener('click', redo, false);
+saveTilesetBtn.addEventListener('click', downloadTilesetAsImage, false);
+tilesetCanvas.addEventListener('mousemove', moveFloatingCanvas, false);
+tilesetCanvas.addEventListener('click', paste, false);
+tilesetCanvas.addEventListener('contextmenu', resetFloatingCanvas, false);
+
+// Init
+if (settings.tilesize !== 8)
+{
+    imageCanvas.style.backgroundImage = `url("/map2tileset/assets/grid-${settings.tilesize / 8}.png")`;
+    tilesetCanvas.style.backgroundImage = `url("/map2tileset/assets/grid-${settings.tilesize / 8}.png")`;
+}
+// Settings
+function openModal(event)
+{
+    event.preventDefault();
+    document.getElementById('tilesize').value = settings.tilesize;
+    const modal = document.getElementById(event.currentTarget.getAttribute("data-target"));
+    modal.open = true;
+    visibleModal = modal;
+}
+
+function closeModal(event)
+{
+    visibleModal = undefined;
+    event.preventDefault();
+    document.getElementById('tilesize').value = settings.tilesize;
+    const modal = document.getElementById(event.currentTarget.getAttribute("data-target"));
+    modal.open = false;
+}
+
+function saveSettings(event)
+{
+    event.preventDefault();
+    settings.tilesize = +document.getElementById('tilesize').value;
+    localStorage.setItem('tilesize', settings.tilesize);
+    closeModal(event);
+}
+
+// Image canvas
+function openImage(event)
+{
+    const imageFiles = event.target.files;
+    const imageFilesLength = imageFiles.length;
+    resetOffset();
+    if (imageFilesLength > 0)
+    {
+        image.name = imageFiles.name;
+        const imageSrc = URL.createObjectURL(imageFiles[0]);
+        imageElm.src = imageSrc;
+        imageElm.addEventListener("load", (e) =>
+        {
+            image.width = imageElm.naturalWidth;
+            image.height = imageElm.naturalHeight;
+            imageCanvas.classList.remove('none');
+            drawImage(imageCanvas, imageElm);
+            image.isLoaded = true;
+        }, { once: true });
+    }
+}
+
+function moveImage()
+{
+    const imageCtx = imageCanvas.getContext('2d');
+    imageCtx.clearRect(0, 0, imageCanvas.width, imageCanvas.height);
+    drawImage(imageCanvas, imageElm, image.offsetX, image.offsetY);
+}
+
+function copy()
+{
+    const imageCtx = imageCanvas.getContext('2d');
+    try
+    {
+        selectedImageArea.data = imageCtx.getImageData(
+            selectedImageArea.sx / image.zoom,
+            selectedImageArea.sy / image.zoom,
+            (selectedImageArea.ex - selectedImageArea.sx) / image.zoom,
+            (selectedImageArea.ey - selectedImageArea.sy) / image.zoom
+        );
+    } catch (error)
+    {
+        alert('Select a zone first');
+        return;
+    }
+
+    floatingCanvas.classList.remove('none');
+    floatingCanvas.classList.add('floating-canvas');
+    floatingCanvas.width = selectedImageArea.ex - selectedImageArea.sx;
+    floatingCanvas.height = selectedImageArea.ey - selectedImageArea.sy;
+    const ctx = floatingCanvas.getContext('2d');
+    ctx.putImageData(selectedImageArea.data, 0, 0);
+}
+
+function setOffsetX(event)
+{
+    image.offsetX = +event.target.value;
+    if (image.isLoaded)
+    {
+        moveImage()
+    }
+}
+
+function setOffsetY(event)
+{
+    image.offsetY = +event.target.value;
+    if (image.isLoaded)
+    {
+        moveImage()
+    }
+}
+
+function resetOffset()
+{
+    image.offsetX = 0;
+    image.offsetY = 0;
+    offsetXInput.value = 0;
+    offsetYInput.value = 0;
+}
+
+function onImageCanvasMouseDown(event)
+{
+    if (image.isLoaded === false || event.button !== 0) return;
+
+    if (selectedImageArea.isComplete)
+    {
+        resetSelection(event);
+    }
+
+    selectedImageArea.sx = roundMultipleTilesize((event.offsetX - image.offsetX) / image.zoom) * image.zoom;
+    selectedImageArea.sy = roundMultipleTilesize((event.offsetY - image.offsetY) / image.zoom) * image.zoom;
+    selectedImageArea.isDirty = true;
+
+    placeRedZone(selectedImageArea.sx, selectedImageArea.sy);
+}
+
+function onImageCanvasMouseUp(event)
+{
+    if (
+        selectedImageArea.isDirty === false ||
+        image.isLoaded === false ||
+        selectedImageArea.isComplete === true ||
+        event.button !== 0
+    ) return;
+
+    // selectedImageArea.ex = roundMultipleTilesize(event.offsetX);
+    // selectedImageArea.ey = roundMultipleTilesize(event.offsetY);
+
+    let width = roundMultipleTilesize((event.offsetX - selectedImageArea.sx) / image.zoom);
+    let height = roundMultipleTilesize((event.offsetY - selectedImageArea.sy) / image.zoom);
+
+    while (isMultipleOfTilesize(width) === false)
+    {
+        width = Math.floor(width + 1);
+    }
+    while (isMultipleOfTilesize(height) === false)
+    {
+        height = Math.floor(height + 1);
+    }
+
+    selectedImageArea.ex = selectedImageArea.sx + width * image.zoom;
+    selectedImageArea.ey = selectedImageArea.sy + height * image.zoom;
+
+    // selectedImageArea.ex = roundMultipleTilesize(event.offsetX);
+    // selectedImageArea.ey = roundMultipleTilesize(event.offsetY);
+
+    if (selectedImageArea.ex === selectedImageArea.sx)
+    {
+        selectedImageArea.ex += settings.tilesize;
+    }
+
+    if (selectedImageArea.ey === selectedImageArea.sy)
+    {
+        selectedImageArea.ey += settings.tilesize;
+    }
+
+    selectedImageArea.isComplete = true;
+    setRedZoneSize(selectedImageArea);
+    copy();
+}
+
+function onMouseMove(event)
+{
+    // zone selection
+    if (event.target.id === 'imageCanvas' && !selectedImageArea.isComplete && selectedImageArea.isDirty)
+    {
+        selectedImageArea.ex = roundMultipleTilesize(event.offsetX);
+        selectedImageArea.ey = roundMultipleTilesize(event.offsetY);
+        setRedZoneSize(selectedImageArea)
+    }
+}
+
+// Tileset canvas
+function openTileset(event)
+{
+    const tilesetFiles = event.target.files;
+    const tilesetFilesLength = tilesetFiles.length;
+    if (tilesetFilesLength > 0)
+    {
+        tileset.name = tilesetFiles[0].name;
+        const tilesetSrc = URL.createObjectURL(tilesetFiles[0]);
+        tilesetElm.src = tilesetSrc;
+        tilesetElm.addEventListener("load", (e) =>
+        {
+            tileset.width = tilesetElm.naturalWidth;
+            tileset.height = tilesetElm.naturalHeight;
+            tilesetCanvas.classList.remove('none');
+            drawImage(tilesetCanvas, tilesetElm);
+            tileset.isLoaded = true;
+            saveTilesetBtn.disabled = false;
+            if (image.isLoaded && selectedImageArea.isComplete)
+            {
+                copy();
+            }
+        }, { once: true });
+    }
+}
+
+function createNewTileset(event)
+{
+    const name = document.getElementById('tileset-name').value || 'tileset';
+    tileset.name = name + '.png';
+    tileset.width = +document.getElementById('tileset-width').value || 512;
+    tileset.height = +document.getElementById('tileset-height').value || 512;
+    tilesetCanvas.width = tileset.width;
+    tilesetCanvas.height = tileset.height;
+    const ctx = tilesetCanvas.getContext('2d');
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fillRect(0, 0, tileset.width, tileset.height);
+    tilesetElm.src = tilesetCanvas.toDataURL();
+    tilesetCanvas.classList.remove('none');
+    tileset.isLoaded = true;
+    saveTilesetBtn.disabled = false;
+    if (image.isLoaded && selectedImageArea.isComplete)
+    {
+        copy();
+    }
+    closeModal(event);
+}
+
+function downloadTilesetAsImage()
+{
+    const newTileset = tilesetCanvas.toDataURL('image/png');
+    const xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.onload = function ()
+    {
+        let a = document.createElement('a');
+        a.href = window.URL.createObjectURL(xhr.response);
+        a.download = tileset.name;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    };
+    xhr.open('GET', newTileset);
+    xhr.send();
+}
+
+function paste(event)
+{
+    const x = roundMultipleTilesize(event.offsetX / tileset.zoom) - roundMultipleTilesize(selectedImageArea.data.width / 2);
+    const y = roundMultipleTilesize(event.offsetY / tileset.zoom) - roundMultipleTilesize(selectedImageArea.data.height / 2);
+
+    const width = (selectedImageArea.ex - selectedImageArea.sx) / image.zoom;
+    const height = (selectedImageArea.ey - selectedImageArea.sy) / image.zoom;
+
+    if (selectedImageArea.data)
+    {
+        const ctx = tilesetCanvas.getContext("2d");
+        const previousData = ctx.getImageData(x, y, width, height);
+        const undo = new Task(previousData, x, y, width, height);
+        tileset.undos.push(undo);
+        const floatingCtx = floatingCanvas.getContext('2d');
+        const floatingData = floatingCtx.getImageData(0, 0, selectedImageArea.data.width, selectedImageArea.data.height);
+        ctx.putImageData(floatingData, x, y);
+        undoBtn.disabled = false;
+    }
+}
+
+function undo()
+{
+    const lastTask = tileset.undos.at(-1);
+    if (!lastTask) return;
+    const ctx = tilesetCanvas.getContext("2d");
+    const redoData = ctx.getImageData(lastTask.x, lastTask.y, lastTask.width, lastTask.height);
+    const redo = new Task(redoData, lastTask.x, lastTask.y, lastTask.width, lastTask.height);
+    tileset.redos.push(redo);
+    ctx.clearRect(lastTask.x, lastTask.y, lastTask.width, lastTask.height);
+    ctx.putImageData(lastTask.data, lastTask.x, lastTask.y);
+    tileset.undos.pop();
+    redoBtn.disabled = false;
+    if (tileset.undos.length === 0)
+    {
+        undoBtn.disabled = true;
+    }
+}
+
+function redo()
+{
+    const lastTask = tileset.redos.at(-1);
+    if (!lastTask) return;
+    const ctx = tilesetCanvas.getContext("2d");
+    const undoData = ctx.getImageData(lastTask.x, lastTask.y, lastTask.width, lastTask.height);
+    const undo = new Task(undoData, lastTask.x, lastTask.y, lastTask.width, lastTask.height);
+    tileset.undos.push(undo);
+    ctx.clearRect(lastTask.x, lastTask.y, lastTask.width, lastTask.height);
+    ctx.putImageData(lastTask.data, lastTask.x, lastTask.y);
+    tileset.redos.pop();
+    undoBtn.disabled = false;
+    if (tileset.redos.length === 0)
+    {
+        redoBtn.disabled = true;
+    }
+}
+
+// Floating canvas
+function moveFloatingCanvas(event)
+{
+    if (selectedImageArea.data === undefined) return;
+
+    if (floatingCanvas.style.width !== floatingCanvas.width * tileset.zoom + 'px')
+    {
+        floatingCanvas.style.width = floatingCanvas.width * tileset.zoom + 'px';
+        floatingCanvas.style.height = floatingCanvas.height * tileset.zoom + 'px';
+    }
+
+    const x = (roundMultipleTilesize(event.offsetX / tileset.zoom) - roundMultipleTilesize(selectedImageArea.data.width / 2)) * tileset.zoom;
+    const y = (roundMultipleTilesize(event.offsetY / tileset.zoom) - roundMultipleTilesize(selectedImageArea.data.height / 2)) * tileset.zoom;
+    const marginX = document.body.clientWidth / 2 - rightPanel.scrollLeft;
+    const marginY = navbarHeight - rightPanel.scrollTop;
+    floatingCanvas.style.left = marginX + x + 'px';
+    floatingCanvas.style.top = marginY + y + 'px';
+}
+
+function flipX()
+{
+    const ctx = floatingCanvas.getContext('2d');
+
+    const inMemoryCanvas = document.createElement('canvas');
+    const inMemoryCtx = inMemoryCanvas.getContext('2d');
+    inMemoryCtx.drawImage(floatingCanvas, 0, 0);
+
+    ctx.clearRect(0, 0, selectedImageArea.data.width, selectedImageArea.data.height);
+    ctx.translate(selectedImageArea.data.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(inMemoryCanvas, 0, 0);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+function flipY()
+{
+    const ctx = floatingCanvas.getContext('2d');
+
+    const inMemoryCanvas = document.createElement('canvas');
+    const inMemoryCtx = inMemoryCanvas.getContext('2d');
+    inMemoryCtx.drawImage(floatingCanvas, 0, 0);
+
+    ctx.clearRect(0, 0, selectedImageArea.data.width, selectedImageArea.data.height);
+    ctx.translate(0, selectedImageArea.data.height);
+    ctx.scale(1, -1);
+    ctx.drawImage(inMemoryCanvas, 0, 0);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+function resetFloatingCanvas(event)
+{
+    event.stopPropagation();
+    event.preventDefault();
+    if (event.button === 2)
+    {
+        const ctx = floatingCanvas.getContext('2d');
+        ctx.clearRect(0, 0, floatingCanvas.width, floatingCanvas.height);
+        selectedImageArea.data = undefined;
+        floatingCanvas.style.left = '0px';
+        floatingCanvas.style.top = '0px';
+        floatingCanvas.width = '0px'
+        floatingCanvas.height = '0px';
+    }
+}
+
+// Red zone
+function placeRedZone(x_pos, y_pos)
+{
+    if (selectedImageArea.isComplete) return;
+    redZone.style.width = '0px';
+    redZone.style.height = '0px';
+    redZone.style.left = x_pos + 'px';
+    redZone.style.top = y_pos + 'px';
+}
+
+function setRedZoneSize(zone)
+{
+    const x = roundMultipleTilesize(zone.ex - zone.sx);
+    const y = roundMultipleTilesize(zone.ey - zone.sy);
+
+    if (redZone.style.width !== x + 'px')
+    {
+        redZone.style.width = x + 'px';
+    }
+
+    if (redZone.style.height !== y + 'px')
+    {
+        redZone.style.height = y + 'px';
+    }
+
+    selectedAreaLabelElm.innerHTML = `Width: ${x / settings.tilesize} Height: ${y / settings.tilesize}`
+}
+
+function resetRedZone()
+{
+    redZone.style.width = '0px';
+    redZone.style.height = '0px';
+    redZone.style.left = '0px';
+    redZone.style.top = '0px';
+}
+
+// Zoom
+function onMouseWheel(event)
+{
+    if (event.ctrlKey) event.preventDefault();
+
+    // zoom image
+    if (event.ctrlKey && event.target.id === 'imageCanvas' && image.isLoaded)
+    {
+        if (selectedImageArea.isComplete) resetSelection(event);
+
+        let scrollX, scrollY;
+        if (event.wheelDelta > 0)
+        {
+            if (image.zoom === 64) return;
+            image.zoom = clamp(image.zoom * 2, 0, 64);
+            scrollX = (event.offsetX - event.clientX / 2) * 2;
+            scrollY = (event.offsetY - (event.clientY - navbarHeight) / 2) * 2;
+
+        }
+        else if (event.wheelDelta < 0)
+        {
+            if (image.zoom < 0.02) return;
+            image.zoom /= 2;
+            scrollX = (event.offsetX - event.clientX * 2) / 2;
+            scrollY = (event.offsetY - (event.clientY - navbarHeight) * 2) / 2;
+        }
+
+        imageCanvas.style.width = image.width * image.zoom + 'px';
+        imageCanvas.style.height = image.height * image.zoom + 'px';
+        leftPanel.scroll(scrollX, scrollY);
+
+        imageZoomLabel.innerText = `Zoom: ${image.zoom}`;
+
+        if (image.zoom >= 1)
+        {
+            imageCanvas.style.backgroundImage = `url("/map2tileset/assets/grid-${image.zoom * settings.tilesize / 8}.png")`;
+        }
+    }
+
+    // zoom tileset
+    if (event.ctrlKey && event.target.id === 'tilesetCanvas' && tileset.isLoaded)
+    {
+        let scrollX, scrollY;
+        if (event.wheelDelta > 0)
+        {
+            if (tileset.zoom === 64) return;
+            tileset.zoom = clamp(tileset.zoom * 2, 0, 64);;
+            scrollX = (event.offsetX - (event.clientX - rightPanel.offsetLeft) / 2) * 2;
+            scrollY = (event.offsetY - (event.clientY - rightPanel.offsetTop) / 2) * 2;
+        }
+        else if (event.wheelDelta < 0)
+        {
+            if (tileset.zoom < 0.02) return;
+            tileset.zoom /= 2;
+            scrollX = (event.offsetX - (event.clientX - rightPanel.offsetLeft) * 2) / 2;
+            scrollY = (event.offsetY - (event.clientY - rightPanel.offsetTop) * 2) / 2;
+        }
+
+        tilesetCanvas.style.width = tileset.width * tileset.zoom + 'px';
+        tilesetCanvas.style.height = tileset.height * tileset.zoom + 'px';
+        rightPanel.scroll(scrollX, scrollY);
+
+        tilesetZoomLabel.innerText = `Zoom: ${tileset.zoom}`;
+
+        if (tileset.zoom >= 1)
+        {
+            tilesetCanvas.style.backgroundImage = `url("/map2tileset/assets/grid-${tileset.zoom * settings.tilesize / 8}.png")`;
+        }
+    }
+}
+
+// Key press
+function handleKeyPress(event)
+{
+    if (event.ctrlKey && event.key === 'z' && undoBtn.disabled === false)
+    {
+        event.preventDefault();
+        undo();
+        return;
+    }
+
+    if (event.ctrlKey && event.key === 'y' && redoBtn.disabled === false)
+    {
+        event.preventDefault();
+        redo();
+        return;
+    }
+
+    if (event.ctrlKey && event.key === 's' && tileset.isLoaded)
+    {
+        event.preventDefault();
+        downloadTilesetAsImage();
+        return;
+    }
+
+    if (event.ctrlKey === false && event.key === 'x' && selectedImageArea.data !== undefined)
+    {
+        flipX();
+        return;
+    }
+
+    if (event.ctrlKey === false && event.key === 'y' && selectedImageArea.data !== undefined)
+    {
+        flipY();
+        return;
+    }
+
+    if (event.ctrlKey && event.key === 'a' && image.isLoaded)
+    {
+        event.preventDefault();
+        selectedImageArea.sx = 0;
+        selectedImageArea.sy = navbarHeight;
+        selectedImageArea.isDirty = true;
+        placeRedZone(selectedImageArea.sx, selectedImageArea.sy);
+        selectedImageArea.ex = image.width;
+        selectedImageArea.ey = image.height;
+        selectedImageArea.isComplete = true;
+        redZone.style.width = image.width + 'px';
+        redZone.style.height = image.height + 'px';
+        copy();
+    }
+}
+
+// Utils
+function resetZone()
+{
+    selectedImageArea.sx = 0;
+    selectedImageArea.sy = 0;
+    selectedImageArea.ex = 0;
+    selectedImageArea.ey = 0;
+    selectedImageArea.isDirty = false;
+}
+
+function drawImage(canvas, img, x = 0, y = 0)
+{
+    const ctx = canvas.getContext("2d");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.drawImage(img, x, y);
+}
+
+function roundMultipleTilesize(num)
+{
+    const size = settings.tilesize;
+    return Math.round(num / size) * size;
+}
+
+function isMultipleOfTilesize(nbr)
+{
+    if (nbr === 0) return false;
+    return nbr % settings.tilesize === 0;
+}
+
+function clamp(number, min, max)
+{
+    return Math.max(min, Math.min(number, max));
+}
+
+function resetSelection(event)
+{
+    event.stopPropagation();
+    event.preventDefault();
+    resetZone();
+    resetRedZone();
+    selectedImageArea.isComplete = false;
+    selectedAreaLabelElm.innerHTML = 'Width: 0 Height: 0';
+}
+
+function debounce(func, time)
+{
+    let timer = null;
+    return (event) =>
+    {
+        clearTimeout(timer);
+        timer = setTimeout(() => func(event), time);
+    };
+}
+
+class Task
+{
+    constructor(data, x, y, width, height)
+    {
+        this.data = data;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+}
+
+})();
