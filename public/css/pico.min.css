@@ -579,21 +579,24 @@ body>main {
     padding-left: var(--spacing)
 }
 
-@media (min-width:576px) {
+/* @media (min-width:576px) {
     .container {
         max-width: 510px;
         padding-right: 0;
         padding-left: 0
     }
-}
+} */
 
-@media (min-width:768px) {
+@media (max-width:768px) {
     .container {
         max-width: 700px
     }
+    nav>ul>li>label.text-light {
+        display: none !important;
+    }
 }
 
-@media (min-width:992px) {
+/* @media (min-width:992px) {
     .container {
         max-width: 920px
     }
@@ -603,7 +606,7 @@ body>main {
     .container {
         max-width: 1130px
     }
-}
+} */
 
 section {
     margin-bottom: var(--block-spacing-vertical)
@@ -613,11 +616,12 @@ section {
     grid-column-gap: var(--grid-spacing-horizontal);
     grid-row-gap: var(--grid-spacing-vertical);
     display: grid;
-    grid-template-columns: 1fr;
+    /* grid-template-columns: 1fr; */
+    grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
     margin: 0
 }
 
-@media (min-width:992px) {
+@media (max-width:992px) {
     .grid {
         grid-template-columns: repeat(auto-fit, minmax(0%, 1fr))
     }
@@ -931,12 +935,13 @@ button {
 button,
 input[type=button],
 input[type=reset],
-input[type=submit] {
+input[type=submit],
+label[type=button] {
     --background-color: var(--primary);
     --border-color: var(--primary);
     --color: var(--primary-inverse);
     --box-shadow: var(--button-box-shadow, 0 0 0 rgba(0, 0, 0, 0));
-    padding: var(--form-element-spacing-vertical) var(--form-element-spacing-horizontal);
+    /* padding: var(--form-element-spacing-vertical) var(--form-element-spacing-horizontal); */
     border: var(--border-width) solid var(--border-color);
     border-radius: var(--border-radius);
     outline: 0;
@@ -2108,7 +2113,7 @@ nav ul:last-of-type {
 nav li {
     display: inline-block;
     margin: 0;
-    padding: var(--nav-element-spacing-vertical) var(--nav-element-spacing-horizontal)
+    padding: 2px 2px;
 }
 
 nav li>* {
@@ -2157,6 +2162,7 @@ nav[aria-label=breadcrumb] a[aria-current] {
 nav [role=button] {
     margin-right: inherit;
     margin-left: inherit;
+    padding: 1px 6px;
     /* padding: var(--nav-link-spacing-vertical) var(--nav-link-spacing-horizontal) */
 }
 

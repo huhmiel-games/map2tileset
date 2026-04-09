@@ -1,16 +1,29 @@
 {
-  "scripts": {
-    "start": "node ./esbuild/dev.cjs",
-    "build": "node ./esbuild/build.cjs & cp -r ./public/* ./build/ ",
-    "build-packages": "grunt",
-    "build-deb": "node-deb -- map2tileset dist/map2tileset/linux64/"
+  "name": "map2tileset",
+  "version": "1.1.0",
+  "type": "module",
+  "nwjs-packager": {
+    "src": "dist/linux64",
+    "buildDir": "dist/appimage",
+    "platforms": ["linux64"],
+    "runtime": "./dist/linux64/map2tileset"
   },
-  "dependencies": {
+  "scripts": {
+    "check": "node ./esbuild/build.cjs && cp -r ./public/* ./build/ && grunt && ./dist/map2tileset/linux64/map2tileset",
+    "build": "node ./esbuild/build.cjs & cp -r ./public/* ./build/",
+    "start": "./dist/map2tileset/linux64/map2tileset",
+    "dist": "grunt",
+    "pack": "npx nwjs-packager"
+  },
+  "devDependencies": {
     "esbuild": "0.14.54",
     "esbuild-dev-server": "^0.3.0",
     "grunt": "1.5.2",
     "grunt-contrib-jshint": "3.2.0",
     "grunt-contrib-watch": "^1.1.0",
     "grunt-nw-builder": "3.1.0"
+  },
+  "dependencies": {
+    "@types/nw.js": "^0.92.0"
   }
 }

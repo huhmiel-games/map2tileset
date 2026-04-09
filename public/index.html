@@ -13,17 +13,9 @@
 </head>
 
 <body>
-    <noscript>Your browser does not support JavaScript!</noscript>
-    <!-- check if mobile -->
-    <script>
-        if (typeof screen.orientation === 'undefined') {
-            alert('Sorry, Map2Tileset does not work on mobile');
-            window.stop();
-        }
-    </script>
-
     <!-- Navbar -->
     <nav class="container-fluid menu grid">
+        <!-- Part of LeftPanel -->
         <ul>
             <li>
                 <label role="button" for="open-image" title="Open image">
@@ -55,6 +47,7 @@
                 <label id="image-zoom" class="inline-label text-light">Zoom: 1</label>
             </li>
         </ul>
+        <!-- Part of RightPanel -->
         <ul>
             <li>
                 <label role="button" for="open-tileset" title="Open tileset">
@@ -81,9 +74,6 @@
                             stroke="#eeeeee" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                     </svg>
                 </button>
-            </li>
-            <li>
-                <label id="tileset-zoom" class="inline-label text-light">Zoom: 1</label>
             </li>
             <li><button id="undo-btn" disabled title="Undo">
                     <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" viewBox="0 0 24 24"
@@ -119,6 +109,9 @@
                     </svg>
                 </button>
             </li>
+            <li>
+                <label id="tileset-zoom" class="inline-label text-light">Zoom: 1</label>
+            </li>
             <li class="right">
                 <button id="settings-btn" data-target="settings-modal" title="Settings">
                     <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
@@ -146,16 +139,23 @@
 
     <!-- Main -->
     <div class="full-height-container">
-        <div id="left-panel" class="left-panel">
+        <!-- LeftMenu -->
+        <div aria-busy="true" id="left-panel" class="left-panel">
             <div id="red-zone" class="red-zone"></div>
-            <canvas id="imageCanvas" class="none"></canvas>
+            <canvas id="image-canvas" class="none"></canvas>
             <img id="image" alt="" class="none" />
         </div>
-        <div id="right-panel" class="right-panel">
-            <canvas id="tilesetCanvas" class="none"></canvas>
+        <!-- RightMenu -->
+        <div aria-busy="true" id="right-panel" class="right-panel">
+            <canvas id="tileset-canvas" class="none"></canvas>
             <canvas id="floating-canvas" class="none no-click"></canvas>
             <img id="tileset" alt="" class="none" />
         </div>
+    </div>
+
+    <!-- Success Notification Toast -->
+    <div id="save-toast" class="save-toast" style="display: none;">
+        Tileset sauvegardé !
     </div>
 
     <!-- Settings Modal -->
@@ -172,10 +172,10 @@
             </div>
 
             <footer>
-                <a href="#cancel" id="close-settings-btn" role="button" class="secondary" data-target="settings-modal">
+                <a class="modal-button secondary" href="#cancel" id="close-settings-btn" role="button" data-target="settings-modal">
                     Cancel
                 </a>
-                <a href="#confirm" id="confirm-settings-btn" role="button" data-target="settings-modal">
+                <a class="modal-button" href="#confirm" id="confirm-settings-btn" role="button" data-target="settings-modal">
                     Save
                 </a>
             </footer>
@@ -183,7 +183,7 @@
     </dialog>
 
     <!-- New Tileset Modal -->
-    <dialog id="tileset-modal">
+    <dialog id="new-tileset-modal">
         <article>
             <a href="#close" id="close-tileset-btn" aria-label="Close" class="close" data-target="tileset-modal">
             </a>
@@ -204,10 +204,10 @@
             </div>
 
             <footer>
-                <a href="#cancel" id="close-tileset-btn" role="button" class="secondary" data-target="tileset-modal">
+                <a class="modal-button secondary" href="#cancel" id="close-tileset-btn" role="button" data-target="tileset-modal">
                     Cancel
                 </a>
-                <a href="#confirm" id="confirm-tileset-btn" role="button" data-target="tileset-modal">
+                <a class="modal-button" href="#confirm" id="confirm-tileset-btn" role="button" data-target="tileset-modal">
                     Save
                 </a>
             </footer>
@@ -217,9 +217,8 @@
     <!-- About Modal -->
     <dialog id="about-modal">
         <article>
-            <a href="#close" id="close-about-btn" aria-label="Close" class="close" data-target="about-modal">
-            </a>
-            <h3>Map2Tileset </h3>
+            <a href="#close" id="close-about-btn" aria-label="Close" class="close" data-target="about-modal"> </a>
+            <h3>Map2Tileset v1.1</h3>
             <strong>@huhmiel-games 2023</strong>
             <p>Map2Tileset is a simple and easy to use graphics tool that help you creates tilesets from map
                 images.<br />
@@ -233,61 +232,71 @@
             </p>
             <p>
                 <strong>Commands: </strong><br />
-                <kbd>
-                    <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
-                        viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
-                        <path d="M20 10v4a8 8 0 11-16 0V9a7 7 0 017-7h1a8 8 0 018 8z" stroke="#000000"
-                            stroke-width="1.5" stroke-linecap="round"></path>
-                        <path d="M12 2v6.4a.6.6 0 01-.6.6H4" stroke="#000000" stroke-width="1.5" stroke-linecap="round">
-                        </path>
-                    </svg>
-                </kbd>Select or Paste<br />
-                <kbd>
-                    <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
-                        viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
-                        <path d="M4 10v4a8 8 0 1016 0V9a7 7 0 00-7-7h-1a8 8 0 00-8 8z" stroke="#000000"
-                            stroke-width="1.5" stroke-linecap="round"></path>
-                        <path d="M12 2v6.4a.6.6 0 00.6.6H20" stroke="#000000" stroke-width="1.5" stroke-linecap="round">
-                        </path>
-                    </svg>
-                </kbd>Reset selection<br />
-                <kbd> 
-                    <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
-                        viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
-                        <path
-                            d="M12 5l.53-.53a.75.75 0 00-1.06 0L12 5zm0 8l-.53.53a.75.75 0 001.06 0L12 13zM9.47 6.47a.75.75 0 001.06 1.06L9.47 6.47zm4 1.06a.75.75 0 101.06-1.06l-1.06 1.06zm-2.94 2.94a.75.75 0 10-1.06 1.06l1.06-1.06zm4 1.06a.75.75 0 10-1.06-1.06l1.06 1.06zM3.25 10v4h1.5v-4h-1.5zm17.5 4v-4h-1.5v4h1.5zm-9.5-9v8h1.5V5h-1.5zm.22-.53l-2 2 1.06 1.06 2-2-1.06-1.06zm0 1.06l2 2 1.06-1.06-2-2-1.06 1.06zm1.06 6.94l-2-2-1.06 1.06 2 2 1.06-1.06zm0 1.06l2-2-1.06-1.06-2 2 1.06 1.06zM20.75 10A8.75 8.75 0 0012 1.25v1.5A7.25 7.25 0 0119.25 10h1.5zM12 22.75A8.75 8.75 0 0020.75 14h-1.5A7.25 7.25 0 0112 21.25v1.5zM3.25 14A8.75 8.75 0 0012 22.75v-1.5A7.25 7.25 0 014.75 14h-1.5zm1.5-4A7.25 7.25 0 0112 2.75v-1.5A8.75 8.75 0 003.25 10h1.5z"
-                            fill="#000000"></path>
-                    </svg>
-                </kbd>Scroll Y<br />
-                <kbd>Shift + 
-                    <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
-                        viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
-                        <path
-                            d="M12 5l.53-.53a.75.75 0 00-1.06 0L12 5zm0 8l-.53.53a.75.75 0 001.06 0L12 13zM9.47 6.47a.75.75 0 001.06 1.06L9.47 6.47zm4 1.06a.75.75 0 101.06-1.06l-1.06 1.06zm-2.94 2.94a.75.75 0 10-1.06 1.06l1.06-1.06zm4 1.06a.75.75 0 10-1.06-1.06l1.06 1.06zM3.25 10v4h1.5v-4h-1.5zm17.5 4v-4h-1.5v4h1.5zm-9.5-9v8h1.5V5h-1.5zm.22-.53l-2 2 1.06 1.06 2-2-1.06-1.06zm0 1.06l2 2 1.06-1.06-2-2-1.06 1.06zm1.06 6.94l-2-2-1.06 1.06 2 2 1.06-1.06zm0 1.06l2-2-1.06-1.06-2 2 1.06 1.06zM20.75 10A8.75 8.75 0 0012 1.25v1.5A7.25 7.25 0 0119.25 10h1.5zM12 22.75A8.75 8.75 0 0020.75 14h-1.5A7.25 7.25 0 0112 21.25v1.5zM3.25 14A8.75 8.75 0 0012 22.75v-1.5A7.25 7.25 0 014.75 14h-1.5zm1.5-4A7.25 7.25 0 0112 2.75v-1.5A8.75 8.75 0 003.25 10h1.5z"
-                            fill="#000000"></path>
-                    </svg>
-                </kbd>Scroll X<br />
-                <kbd>Ctrl + 
-                    <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
-                        viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
-                        <path
-                            d="M12 5l.53-.53a.75.75 0 00-1.06 0L12 5zm0 8l-.53.53a.75.75 0 001.06 0L12 13zM9.47 6.47a.75.75 0 001.06 1.06L9.47 6.47zm4 1.06a.75.75 0 101.06-1.06l-1.06 1.06zm-2.94 2.94a.75.75 0 10-1.06 1.06l1.06-1.06zm4 1.06a.75.75 0 10-1.06-1.06l1.06 1.06zM3.25 10v4h1.5v-4h-1.5zm17.5 4v-4h-1.5v4h1.5zm-9.5-9v8h1.5V5h-1.5zm.22-.53l-2 2 1.06 1.06 2-2-1.06-1.06zm0 1.06l2 2 1.06-1.06-2-2-1.06 1.06zm1.06 6.94l-2-2-1.06 1.06 2 2 1.06-1.06zm0 1.06l2-2-1.06-1.06-2 2 1.06 1.06zM20.75 10A8.75 8.75 0 0012 1.25v1.5A7.25 7.25 0 0119.25 10h1.5zM12 22.75A8.75 8.75 0 0020.75 14h-1.5A7.25 7.25 0 0112 21.25v1.5zM3.25 14A8.75 8.75 0 0012 22.75v-1.5A7.25 7.25 0 014.75 14h-1.5zm1.5-4A7.25 7.25 0 0112 2.75v-1.5A8.75 8.75 0 003.25 10h1.5z"
-                            fill="#000000"></path>
-                    </svg>
-                </kbd>Zoom<br />
-                <kbd>Ctrl + A</kbd>Select all<br />
-                <kbd>Ctrl + Z</kbd>Undo<br />
-                <kbd>Ctrl + Y</kbd>Redo<br />
-                <kbd>Ctrl + S</kbd>Save<br />
-                <kbd>X</kbd>Flip selection horizontally<br />
-                <kbd>Y</kbd>Flip selection vertically<br />
             </p>
-            <strong>Enjoy... </strong>
+            <div class="grid">
+                <div><kbd>
+                        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
+                            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
+                            <path d="M20 10v4a8 8 0 11-16 0V9a7 7 0 017-7h1a8 8 0 018 8z" stroke="#000000"
+                                stroke-width="1.5" stroke-linecap="round"></path>
+                            <path d="M12 2v6.4a.6.6 0 01-.6.6H4" stroke="#000000" stroke-width="1.5"
+                                stroke-linecap="round">
+                            </path>
+                        </svg>
+                    </kbd>Select or Paste<br />
+                    <kbd>
+                        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
+                            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
+                            <path d="M4 10v4a8 8 0 1016 0V9a7 7 0 00-7-7h-1a8 8 0 00-8 8z" stroke="#000000"
+                                stroke-width="1.5" stroke-linecap="round"></path>
+                            <path d="M12 2v6.4a.6.6 0 00.6.6H20" stroke="#000000" stroke-width="1.5"
+                                stroke-linecap="round">
+                            </path>
+                        </svg>
+                    </kbd>Reset selection<br />
+                    <kbd>
+                        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
+                            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
+                            <path
+                                d="M12 5l.53-.53a.75.75 0 00-1.06 0L12 5zm0 8l-.53.53a.75.75 0 001.06 0L12 13zM9.47 6.47a.75.75 0 001.06 1.06L9.47 6.47zm4 1.06a.75.75 0 101.06-1.06l-1.06 1.06zm-2.94 2.94a.75.75 0 10-1.06 1.06l1.06-1.06zm4 1.06a.75.75 0 10-1.06-1.06l1.06 1.06zM3.25 10v4h1.5v-4h-1.5zm17.5 4v-4h-1.5v4h1.5zm-9.5-9v8h1.5V5h-1.5zm.22-.53l-2 2 1.06 1.06 2-2-1.06-1.06zm0 1.06l2 2 1.06-1.06-2-2-1.06 1.06zm1.06 6.94l-2-2-1.06 1.06 2 2 1.06-1.06zm0 1.06l2-2-1.06-1.06-2 2 1.06 1.06zM20.75 10A8.75 8.75 0 0012 1.25v1.5A7.25 7.25 0 0119.25 10h1.5zM12 22.75A8.75 8.75 0 0020.75 14h-1.5A7.25 7.25 0 0112 21.25v1.5zM3.25 14A8.75 8.75 0 0012 22.75v-1.5A7.25 7.25 0 014.75 14h-1.5zm1.5-4A7.25 7.25 0 0112 2.75v-1.5A8.75 8.75 0 003.25 10h1.5z"
+                                fill="#000000"></path>
+                        </svg>
+                    </kbd>Scroll Y<br />
+                    <kbd>Shift +
+                        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
+                            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
+                            <path
+                                d="M12 5l.53-.53a.75.75 0 00-1.06 0L12 5zm0 8l-.53.53a.75.75 0 001.06 0L12 13zM9.47 6.47a.75.75 0 001.06 1.06L9.47 6.47zm4 1.06a.75.75 0 101.06-1.06l-1.06 1.06zm-2.94 2.94a.75.75 0 10-1.06 1.06l1.06-1.06zm4 1.06a.75.75 0 10-1.06-1.06l1.06 1.06zM3.25 10v4h1.5v-4h-1.5zm17.5 4v-4h-1.5v4h1.5zm-9.5-9v8h1.5V5h-1.5zm.22-.53l-2 2 1.06 1.06 2-2-1.06-1.06zm0 1.06l2 2 1.06-1.06-2-2-1.06 1.06zm1.06 6.94l-2-2-1.06 1.06 2 2 1.06-1.06zm0 1.06l2-2-1.06-1.06-2 2 1.06 1.06zM20.75 10A8.75 8.75 0 0012 1.25v1.5A7.25 7.25 0 0119.25 10h1.5zM12 22.75A8.75 8.75 0 0020.75 14h-1.5A7.25 7.25 0 0112 21.25v1.5zM3.25 14A8.75 8.75 0 0012 22.75v-1.5A7.25 7.25 0 014.75 14h-1.5zm1.5-4A7.25 7.25 0 0112 2.75v-1.5A8.75 8.75 0 003.25 10h1.5z"
+                                fill="#000000"></path>
+                        </svg>
+                    </kbd>Scroll X<br />
+                    <kbd>Ctrl +
+                        <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5"
+                            viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000">
+                            <path
+                                d="M12 5l.53-.53a.75.75 0 00-1.06 0L12 5zm0 8l-.53.53a.75.75 0 001.06 0L12 13zM9.47 6.47a.75.75 0 001.06 1.06L9.47 6.47zm4 1.06a.75.75 0 101.06-1.06l-1.06 1.06zm-2.94 2.94a.75.75 0 10-1.06 1.06l1.06-1.06zm4 1.06a.75.75 0 10-1.06-1.06l1.06 1.06zM3.25 10v4h1.5v-4h-1.5zm17.5 4v-4h-1.5v4h1.5zm-9.5-9v8h1.5V5h-1.5zm.22-.53l-2 2 1.06 1.06 2-2-1.06-1.06zm0 1.06l2 2 1.06-1.06-2-2-1.06 1.06zm1.06 6.94l-2-2-1.06 1.06 2 2 1.06-1.06zm0 1.06l2-2-1.06-1.06-2 2 1.06 1.06zM20.75 10A8.75 8.75 0 0012 1.25v1.5A7.25 7.25 0 0119.25 10h1.5zM12 22.75A8.75 8.75 0 0020.75 14h-1.5A7.25 7.25 0 0112 21.25v1.5zM3.25 14A8.75 8.75 0 0012 22.75v-1.5A7.25 7.25 0 014.75 14h-1.5zm1.5-4A7.25 7.25 0 0112 2.75v-1.5A8.75 8.75 0 003.25 10h1.5z"
+                                fill="#000000"></path>
+                        </svg>
+                    </kbd>Zoom<br />
+                </div>
+                <div>
+                    <kbd>Ctrl + A</kbd>Select all<br />
+                    <kbd>Ctrl + Z</kbd>Undo<br />
+                    <kbd>Ctrl + Y</kbd>Redo<br />
+                    <kbd>Ctrl + S</kbd>Save<br />
+                    <kbd>X</kbd>Flip selection horizontally<br />
+                    <kbd>Y</kbd>Flip selection vertically<br />
+                </div>
+            </div>
+
+
+            <p>
+                <strong>Enjoy... </strong>
             </p>
 
 
             <footer>
-                <a href="#confirm" id="close-about-btn" role="button" data-target="about-modal">
+                <a class="modal-button" href="#confirm" id="close-about-btn" role="button" data-target="about-modal">
                     Ok
                 </a>
             </footer>

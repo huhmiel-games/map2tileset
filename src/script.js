@@ -166,6 +166,8 @@ function copy()
     floatingCanvas.height = selectedImageArea.ey - selectedImageArea.sy;
     const ctx = floatingCanvas.getContext('2d');
     ctx.putImageData(selectedImageArea.data, 0, 0);
+
+    selectedAreaLabelElm.innerHTML = `Width: ${selectedImageArea.data.width} Height: ${selectedImageArea.data.height}`;
 }
 
 function setOffsetX(event)
@@ -480,7 +482,7 @@ function setRedZoneSize(zone)
         redZone.style.height = y + 'px';
     }
 
-    selectedAreaLabelElm.innerHTML = `Width: ${x / settings.tilesize} Height: ${y / settings.tilesize}`
+    // selectedAreaLabelElm.innerHTML = `Width: ${x / settings.tilesize} Height: ${y / settings.tilesize}`
 }
 
 function resetRedZone()

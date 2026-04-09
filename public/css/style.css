@@ -2,7 +2,7 @@ html {
     background-color: #1F1F1F;
     overflow: none;
     width: 1200px;
-    min-width: 1200px;
+    min-width: 676px;
 }
 
 body {
@@ -67,6 +67,7 @@ svg {
 .red-zone {
     position: absolute;
     background-color: #dc143c80;
+    pointer-events: none;
 }
 
 .menu {
@@ -96,6 +97,7 @@ svg {
 
 .text-light {
     color: #eee !important;
+    white-space: nowrap;
 }
 
 .no-click {
@@ -104,6 +106,22 @@ svg {
 
 .right {
     margin-left: auto;
+}
+
+.modal-button {
+    padding: 1px 6px;
+}
+
+.save-toast {
+    position: fixed; 
+    bottom: 20px; 
+    right: 20px; 
+    background: var(--pico-ins-color);
+    background-color: green;
+    color: white; 
+    padding: 10px 20px; 
+    border-radius: 4px; 
+    z-index: 9999;
 }
 
 kbd>svg {
