@@ -2,6 +2,7 @@
  * NOT USED ANYMORE, KEEPED HERE FOR REFERENCE
  */
 
+(()=>{
 // Html elements
 const saveTilesetBtn = document.getElementById('save-tileset');
 const undoBtn = document.getElementById('undo-btn');
@@ -88,8 +89,8 @@ tilesetCanvas.addEventListener('contextmenu', resetFloatingCanvas, false);
 // Init
 if (settings.tilesize !== 8)
 {
-    imageCanvas.style.backgroundImage = `url("/assets/grid-${settings.tilesize / 8}.png")`;
-    tilesetCanvas.style.backgroundImage = `url("/assets/grid-${settings.tilesize / 8}.png")`;
+    imageCanvas.style.backgroundImage = `url("/map2tileset/assets/grid-${settings.tilesize / 8}.png")`;
+    tilesetCanvas.style.backgroundImage = `url("/map2tileset/assets/grid-${settings.tilesize / 8}.png")`;
 }
 // Settings
 function openModal(event)
@@ -532,7 +533,7 @@ function onMouseWheel(event)
 
         if (image.zoom >= 1)
         {
-            imageCanvas.style.backgroundImage = `url("/assets/grid-${image.zoom * settings.tilesize / 8}.png")`;
+            imageCanvas.style.backgroundImage = `url("/map2tileset/assets/grid-${image.zoom * settings.tilesize / 8}.png")`;
         }
     }
 
@@ -563,7 +564,7 @@ function onMouseWheel(event)
 
         if (tileset.zoom >= 1)
         {
-            tilesetCanvas.style.backgroundImage = `url("/assets/grid-${tileset.zoom * settings.tilesize / 8}.png")`;
+            tilesetCanvas.style.backgroundImage = `url("/map2tileset/assets/grid-${tileset.zoom * settings.tilesize / 8}.png")`;
         }
     }
 }
@@ -686,3 +687,5 @@ class Task
         this.height = height;
     }
 }
+
+})();
