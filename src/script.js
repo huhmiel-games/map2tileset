@@ -1,3 +1,7 @@
+/**
+ * NOT USED ANYMORE, KEEPED HERE FOR REFERENCE
+ */
+
 // Html elements
 const saveTilesetBtn = document.getElementById('save-tileset');
 const undoBtn = document.getElementById('undo-btn');
